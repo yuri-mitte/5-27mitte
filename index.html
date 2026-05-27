@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>ストラップ診断 | あなたにぴったりのスマホの持ち方を探そう</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+
+    :root {
+      --bg: #0e0c0a;
+      --surface: #1a1713;
+      --card: #211e1a;
+      --border: #3a3530;
+      --accent: #e8b86d;
+      --accent2: #c97d4e;
+      --text: #f0ebe4;
+      --muted: #8a8077;
+      --tag: #2e2a24;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* 背景テクスチャ */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(232,184,109,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(201,125,78,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ヘッダー */
+    .header {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+
+    .header-eyebrow {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 7vw, 44px);
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .header p {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* 進行バー */
+    .progress-bar {
+      background: var(--border);
+      border-radius: 2px;
+      height: 2px;
+      margin: 32px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    /* 質問カード */
+    .question-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-num {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: clamp(16px, 4vw, 20px);
+      font-weight: 700;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+
+    /* 選択肢 */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .option-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(232,184,109,0.06), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .option-btn:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+
+    .option-btn:hover::before { opacity: 1; }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background: rgba(232,184,109,0.08);
+    }
+
+    .option-label {
+      font-weight: 700;
+      color: var(--accent);
+      margin-right: 10px;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    /* 結果 */
+    .result-card {
+      animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .result-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #0e0c0a;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .result-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 6vw, 36px);
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .result-subtitle {
+      font-size: 14px;
+      color: var(--accent);
+      margin-bottom: 24px;
+      font-weight: 400;
+    }
+
+    .result-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    .result-section {
+      margin-bottom: 28px;
+    }
+
+    .result-section-title {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .result-body {
+      font-size: 14px;
+      line-height: 1.9;
+      color: #c8c0b4;
+      font-weight: 300;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #c8c0b4;
+    }
+
+    .feature-list li::before {
+      content: '—';
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      background: var(--tag);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.5px;
+    }
+
+    /* スコアバー */
+    .score-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 28px;
+    }
+
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .score-row:last-child { margin-bottom: 0; }
+
+    .score-label {
+      font-size: 12px;
+      color: var(--muted);
+      width: 140px;
+      flex-shrink: 0;
+    }
+
+    .score-track {
+      flex: 1;
+      background: var(--tag);
+      border-radius: 2px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
+    }
+
+    .score-val {
+      font-size: 12px;
+      color: var(--accent);
+      width: 30px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ボタン */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #0e0c0a;
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      display: block;
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 13px;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      margin-top: 12px;
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* スタート画面 */
+    .start-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .start-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 20px;
+      line-height: 1;
+    }
+
+    .start-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+
+    .start-card p {
+      font-size: 13px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .question-types {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 32px;
+    }
+
+    .q-type {
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--tag);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 12px;
+    }
+
+    @media (max-width: 480px) {
+      .question-card { padding: 28px 20px; }
+      .start-card { padding: 32px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <span class="header-eyebrow">Smartphone Strap Diagnosis</span>
+    <h1>あなたの<em>ライフスタイル</em>に<br>合うストラップは？</h1>
+    <p>7つの質問に答えるだけで、スマホショルダーかハンドストラップか<br>あなたにぴったりの選択肢をご提案します。</p>
+  </div>
+
+  <div id="app"></div>
+
+</div>
+
+<script>
+  // ===== 質問データ =====
+  const questions = [
+    {
+      id: 1,
+      text: "外出するとき、荷物はどんなスタイルが多いですか？",
+      options: [
+        { label: "A", text: "バッグを持ち歩くことが多い", scores: { shoulder: 1, hand: 3 } },
+        { label: "B", text: "バッグを持たずに身軽でいたい", scores: { shoulder: 4, hand: 1 } },
+        { label: "C", text: "どちらもある。場面によって変わる", scores: { shoulder: 2, hand: 2 } },
+      ]
+    },
+    {
+      id: 2,
+      text: "スマホを使うシーンとして一番近いのは？",
+      options: [
+        { label: "A", text: "移動中に地図・乗換案内・SNSをよく見る", scores: { shoulder: 3, hand: 2 } },
+        { label: "B", text: "決まった場所（カフェ・デスク）で集中して使う", scores: { shoulder: 1, hand: 3 } },
+        { label: "C", text: "仕事や買い物などで立ちながら素早く確認する", scores: { shoulder: 2, hand: 3 } },
+      ]
+    },
+    {
+      id: 3,
+      text: "スマホを落としたり、なくしそうになることは？",
+      options: [
+        { label: "A", text: "よくある。不安でいつもヒヤヒヤしている", scores: { shoulder: 3, hand: 4 } },
+        { label: "B", text: "たまにある。気をつけてはいるけど…", scores: { shoulder: 2, hand: 3 } },
+        { label: "C", text: "ほとんどない。丁寧に扱っているほうだと思う", scores: { shoulder: 2, hand: 1 } },
+      ]
+    },
+    {
+      id: 4,
+      text: "お出かけのシーン、どれが一番近いですか？",
+      options: [
+        { label: "A", text: "ショッピング・観光・ライブなどアクティブ系", scores: { shoulder: 4, hand: 2 } },
+        { label: "B", text: "通勤・通学などの日常の移動がメイン", scores: { shoulder: 3, hand: 3 } },
+        { label: "C", text: "カフェ・グルメ・インドア系のお出かけが多い", scores: { shoulder: 1, hand: 3 } },
+      ]
+    },
+    {
+      id: 5,
+      text: "ファッションへのこだわりは？",
+      options: [
+        { label: "A", text: "コーデのアクセントとして小物も楽しみたい", scores: { shoulder: 4, hand: 2 } },
+        { label: "B", text: "シンプル・目立たないほうが好き", scores: { shoulder: 1, hand: 3 } },
+        { label: "C", text: "機能性重視。見た目はあまり気にしない", scores: { shoulder: 2, hand: 2 } },
+      ]
+    },
+    {
+      id: 6,
+      text: "両手を使うシーンがどのくらいありますか？",
+      options: [
+        { label: "A", text: "多い。子育て・荷物持ち・自転車など", scores: { shoulder: 5, hand: 1 } },
+        { label: "B", text: "時々ある。食事・傘など", scores: { shoulder: 3, hand: 2 } },
+        { label: "C", text: "あまりない。基本は片手が空いている", scores: { shoulder: 1, hand: 3 } },
+      ]
+    },
+    {
+      id: 7,
+      text: "スマホと財布・カード類の管理はどうしていますか？",
+      options: [
+        { label: "A", text: "スマホだけ持てば完結したい（スマホ決済中心）", scores: { shoulder: 3, hand: 3 } },
+        { label: "B", text: "カードや小物もまとめて持ち運びたい", scores: { shoulder: 4, hand: 2 } },
+        { label: "C", text: "財布は別で持つのが落ち着く", scores: { shoulder: 1, hand: 2 } },
+      ]
+    }
+  ];
+
+  // ===== 診断結果データ =====
+  const results = {
+    shoulder: {
+      type: "スマホショルダー",
+      subtitle: "アクティブ派・両手フリースト派",
+      emoji: "👜",
+      description: "あなたのライフスタイルには、スマホショルダーがぴったりです。動き回ることが多く、両手を自由に使いたい場面が多いあなたに、ショルダータイプは最適な相棒になります。",
+      features: [
+        "両手がフリーになるので子育て・自転車・荷物持ちも安心",
+        "移動中のスマホアクセスがスムーズになる",
+        "バッグを持たない「身軽スタイル」が実現できる",
+        "コーデのアクセントとしてファッションに馴染む",
+        "落下・置き忘れのリスクが激減する",
+      ],
+      tips: "長さ調節できるタイプを選ぶと、斜めがけとショルダーをシーンに応じて切り替えられます。スマホポーチやカードホルダー付きなら、財布いらずの身軽さも叶います。",
+      tags: ["両手フリー", "身軽スタイル", "アクティブ", "ファッション小物", "移動中に便利"],
+    },
+    hand: {
+      type: "ハンドストラップ",
+      subtitle: "集中派・さっと使いたい派",
+      emoji: "📱",
+      description: "あなたのライフスタイルには、ハンドストラップがぴったりです。スマホをサッと出し入れして、コンパクトに持ち歩きたいあなたに、手首や指に引っかけるタイプが活躍します。",
+      features: [
+        "片手でしっかりホールドでき落下事故を防ぐ",
+        "ポケットやバッグからの取り出しがスムーズ",
+        "コンパクトで邪魔にならない",
+        "スマホ本来のデザインを活かせる",
+        "すでにバッグを持つ人の「落下防止」として最適",
+      ],
+      tips: "指にかけるタイプは片手操作のホールド感が増し、手首に通すタイプは不意の落下防止に特化しています。素材や色でさりげなくおしゃれを楽しめます。",
+      tags: ["落下防止", "コンパクト", "さっと使える", "バッグ派の方に", "シンプル"],
+    },
+    both: {
+      type: "シーン別使い分けがおすすめ",
+      subtitle: "フレキシブル派",
+      emoji: "✨",
+      description: "あなたのライフスタイルはシーンによって異なるため、スマホショルダーとハンドストラップの両方を使い分けるのが理想的です。",
+      features: [
+        "アクティブな外出日はショルダーで両手フリーに",
+        "バッグを持つ日はハンドストラップで落下防止",
+        "ファッションや気分に合わせて気軽に交換できる",
+        "対応ケースならストラップ着脱が簡単",
+      ],
+      tips: "取り外し可能なストラップホール付きのスマホケースがあれば、ショルダーとハンドストラップを同じケースで使い回せて経済的です。",
+      tags: ["使い分け", "フレキシブル", "どちらも活用", "ケース対応"],
+    }
+  };
+
+  // ===== アプリ状態 =====
+  let state = {
+    screen: 'start', // start | quiz | result
+    currentQ: 0,
+    answers: [],
+    scores: { shoulder: 0, hand: 0 }
+  };
+
+  function calcResult() {
+    const { shoulder, hand } = state.scores;
+    const diff = Math.abs(shoulder - hand);
+    if (diff <= 3) return results.both;
+    return shoulder > hand ? results.shoulder : results.hand;
+  }
+
+  function render() {
+    const app = document.getElementById('app');
+    if (state.screen === 'start') {
+      app.innerHTML = renderStart();
+    } else if (state.screen === 'quiz') {
+      app.innerHTML = renderQuiz();
+    } else {
+      app.innerHTML = renderResult();
+      // スコアバーアニメーション
+      setTimeout(() => {
+        document.querySelectorAll('.score-fill').forEach(el => {
+          el.style.width = el.dataset.width;
+        });
+      }, 50);
+    }
+  }
+
+  function renderStart() {
+    return `
+      <div class="start-card">
+        <span class="start-icon">🎯</span>
+        <h2>7問の診断スタート</h2>
+        <p>あなたの日常を思い浮かべながら<br>直感で答えてください。<br>所要時間：約1〜2分</p>
+        <div class="question-types">
+          <span class="q-type">荷物スタイル</span>
+          <span class="q-type">使い方パターン</span>
+          <span class="q-type">落下リスク</span>
+          <span class="q-type">お出かけシーン</span>
+          <span class="q-type">ファッション</span>
+          <span class="q-type">両手の使い方</span>
+          <span class="q-type">スマホ決済</span>
+        </div>
+        <button class="btn-primary" onclick="startQuiz()">診断を始める</button>
+      </div>
+    `;
+  }
+
+  function renderQuiz() {
+    const q = questions[state.currentQ];
+    const progress = ((state.currentQ) / questions.length) * 100;
+    return `
+      <div>
+        <div class="progress-text">
+          <span>質問 ${state.currentQ + 1} / ${questions.length}</span>
+          <span>${Math.round(progress)}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+        <div class="question-card">
+          <span class="question-num">Q${q.id.toString().padStart(2,'0')}</span>
+          <div class="question-text">${q.text}</div>
+          <div class="options">
+            ${q.options.map((opt, i) => `
+              <button class="option-btn" onclick="selectOption(${i})">
+                <span class="option-label">${opt.label}</span>${opt.text}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderResult() {
+    const res = calcResult();
+    const total = state.scores.shoulder + state.scores.hand;
+    const sp = Math.round((state.scores.shoulder / total) * 100);
+    const hp = Math.round((state.scores.hand / total) * 100);
+    return `
+      <div class="result-card">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 100%"></div>
+        </div>
+
+        <div class="question-card" style="margin-top: 20px;">
+          <span class="result-badge">YOUR RESULT</span>
+          <div style="font-size: 40px; margin-bottom: 12px;">${res.emoji}</div>
+          <div class="result-title">${res.type}</div>
+          <div class="result-subtitle"># ${res.subtitle}</div>
+          <p class="result-body">${res.description}</p>
+
+          <hr class="result-divider">
+
+          <div class="result-section">
+            <div class="result-section-title">あなたのスコア</div>
+            <div class="score-section">
+              <div class="score-row">
+                <span class="score-label">スマホショルダー向き</span>
+                <div class="score-track">
+                  <div class="score-fill" data-width="${sp}%" style="width:0%"></div>
+                </div>
+                <span class="score-val">${sp}%</span>
+              </div>
+              <div class="score-row">
+                <span class="score-label">ハンドストラップ向き</span>
+                <div class="score-track">
+                  <div class="score-fill" data-width="${hp}%" style="width:0%"></div>
+                </div>
+                <span class="score-val">${hp}%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-section">
+            <div class="result-section-title">おすすめポイント</div>
+            <ul class="feature-list">
+              ${res.features.map(f => `<li>${f}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="result-section">
+            <div class="result-section-title">選ぶときのヒント</div>
+            <p class="result-body">${res.tips}</p>
+          </div>
+
+          <div class="result-section">
+            <div class="result-section-title">キーワード</div>
+            <div class="tags">
+              ${res.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="restart()">もう一度診断する</button>
+          <button class="btn-ghost" onclick="restart()">最初に戻る</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== アクション =====
+  function startQuiz() {
+    state.screen = 'quiz';
+    state.currentQ = 0;
+    state.answers = [];
+    state.scores = { shoulder: 0, hand: 0 };
+    render();
+  }
+
+  function selectOption(index) {
+    const q = questions[state.currentQ];
+    const opt = q.options[index];
+    state.answers.push(index);
+    state.scores.shoulder += opt.scores.shoulder;
+    state.scores.hand += opt.scores.hand;
+
+    if (state.currentQ < questions.length - 1) {
+      state.currentQ++;
+      render();
+    } else {
+      state.screen = 'result';
+      render();
+    }
+  }
+
+  function restart() {
+    state.screen = 'start';
+    render();
+  }
+
+  // 初期描画
+  render();
+</script>
+</body>
+</html>
